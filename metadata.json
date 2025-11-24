@@ -1,0 +1,5 @@
+{
+  "name": "DietSplit",
+  "description": "Smart bill splitting for groups with mixed dietary restrictions (Vegan, Vegetarian, Everything). Automatically calculates shares based on what each person can eat.",
+  "requestFramePermissions": []
+}
