@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dish, DishType, Friend, DietType } from '../types';
 import { DISH_ICONS, DISH_LABELS, DIET_LABELS } from '../constants';
 import { parseReceiptText } from '../services/geminiService';
-import { Plus, Trash2, Sparkles, Loader2, Info, AlertTriangle, Users } from 'lucide-react';
+import { Plus, Trash2, Sparkles, Loader2, Info, AlertTriangle } from 'lucide-react';
 
 interface DishListProps {
   dishes: Dish[];

@@ -1,11 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { DishType } from "../types";
 
-// Helper to sanitize JSON string if the model returns markdown code blocks
-const cleanJsonString = (str: string) => {
-  return str.replace(/```json\n?|```/g, '').trim();
-};
-
 export const parseReceiptText = async (text: string): Promise<Array<{ name: string, price: number, type: DishType }>> => {
   if (!process.env.API_KEY) {
     throw new Error("API Key is missing. Please set REACT_APP_GEMINI_API_KEY.");
