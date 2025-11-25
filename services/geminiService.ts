@@ -13,10 +13,9 @@ export const parseReceiptText = async (text: string): Promise<Array<{ name: stri
     Extract a list of dishes with their prices and dietary category.
     
     Rules for Category:
-    - If it likely contains meat/fish: 'MEAT'
-    - If it is vegetarian (has cheese, eggs, milk) but no meat: 'VEGETARIAN'
-    - If it is purely plant-based (vegan): 'VEGAN'
-    - If unsure, guess based on common ingredients.
+    - MEAT: Contains meat, fish, or unknown ingredients. This corresponds to the "Everything" diet option.
+    - VEGETARIAN: No meat/fish, but contains eggs/dairy/cheese.
+    - VEGAN: Plant-based only.
     
     Text to analyze: "${text}"
   `;

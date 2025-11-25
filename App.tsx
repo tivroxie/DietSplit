@@ -22,6 +22,10 @@ const App: React.FC = () => {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [history, setHistory] = useState<SavedSplit[]>([]);
+  
+  // New State for Tax and Tips
+  const [tax, setTax] = useState<number>(0);
+  const [tip, setTip] = useState<number>(0);
 
   // Load history from local storage on mount
   useEffect(() => {
@@ -93,6 +97,24 @@ const App: React.FC = () => {
     setDishes(dishes.filter(d => d.id !== id));
   };
 
+  const updateDishType = (dishId: string, newType: DishType) => {
+    setDishes(dishes.map(d => {
+      if (d.id !== dishId) return d;
+      
+      // When type changes, strictly reset participants based on new compatibility rules.
+      // This is the "Smart" part of Smart Splitting.
+      const newParticipants = friends
+        .filter(f => isDietCompatible(f, newType))
+        .map(f => f.id);
+
+      return {
+        ...d,
+        type: newType,
+        participantIds: newParticipants
+      };
+    }));
+  };
+
   const toggleParticipation = (dishId: string, friendId: string) => {
     setDishes(dishes.map(dish => {
       if (dish.id !== dishId) return dish;
@@ -109,10 +131,14 @@ const App: React.FC = () => {
   const startNewSplit = () => {
     // Only save if there was actual data
     if (dishes.length > 0 && friends.length > 0) {
+      const subtotal = dishes.reduce((acc, d) => acc + d.price, 0);
       const newRecord: SavedSplit = {
         id: generateId(),
         date: new Date().toISOString(),
-        total: dishes.reduce((acc, d) => acc + d.price, 0),
+        subtotal: subtotal,
+        tax: tax,
+        tip: tip,
+        total: subtotal + tax + tip,
         friendCount: friends.length,
         dishCount: dishes.length,
         friends: [...friends],
@@ -127,12 +153,16 @@ const App: React.FC = () => {
     // Reset App State
     setFriends(INITIAL_FRIENDS);
     setDishes([]);
+    setTax(0);
+    setTip(0);
     setStep(1);
   };
 
   const loadHistorySplit = (split: SavedSplit) => {
     setFriends(split.friends);
     setDishes(split.dishes);
+    setTax(split.tax || 0);
+    setTip(split.tip || 0);
     setStep(3); // Go straight to summary view
   };
 
@@ -216,6 +246,7 @@ const App: React.FC = () => {
                 onRemoveDish={removeDish}
                 onToggleParticipation={toggleParticipation}
                 onBulkAddDishes={bulkAddDishes}
+                onUpdateDishType={updateDishType}
               />
             </div>
 
@@ -241,6 +272,10 @@ const App: React.FC = () => {
                <Summary 
                   dishes={dishes} 
                   friends={friends} 
+                  tax={tax}
+                  setTax={setTax}
+                  tip={tip}
+                  setTip={setTip}
                   onToggleParticipation={toggleParticipation}
                   onStartNewSplit={startNewSplit}
                 />

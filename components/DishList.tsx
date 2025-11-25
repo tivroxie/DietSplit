@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dish, DishType, Friend, DietType } from '../types';
 import { DISH_ICONS, DISH_LABELS, DIET_LABELS } from '../constants';
 import { parseReceiptText } from '../services/geminiService';
-import { Plus, Trash2, Sparkles, Loader2, Info, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Sparkles, Loader2, Info, AlertTriangle, ChevronDown } from 'lucide-react';
 
 interface DishListProps {
   dishes: Dish[];
@@ -11,9 +11,10 @@ interface DishListProps {
   onRemoveDish: (id: string) => void;
   onToggleParticipation: (dishId: string, friendId: string) => void;
   onBulkAddDishes: (dishes: Omit<Dish, 'id' | 'participantIds'>[]) => void;
+  onUpdateDishType: (dishId: string, newType: DishType) => void;
 }
 
-export const DishList: React.FC<DishListProps> = ({ dishes, friends, onAddDish, onRemoveDish, onToggleParticipation, onBulkAddDishes }) => {
+export const DishList: React.FC<DishListProps> = ({ dishes, friends, onAddDish, onRemoveDish, onToggleParticipation, onBulkAddDishes, onUpdateDishType }) => {
   const [newDishName, setNewDishName] = useState('');
   const [newDishPrice, setNewDishPrice] = useState('');
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
@@ -151,12 +152,37 @@ export const DishList: React.FC<DishListProps> = ({ dishes, friends, onAddDish, 
             <div key={dish.id} className="border border-gray-100 rounded-lg p-4 hover:border-gray-200 transition-all bg-white shadow-sm">
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${dish.type === DishType.MEAT ? 'bg-red-50 text-red-500' : dish.type === DishType.VEGETARIAN ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                    <Icon className="w-5 h-5" />
+                  <div className={`p-2 rounded-lg relative group/icon cursor-pointer transition-colors ${dish.type === DishType.MEAT ? 'bg-red-50 text-red-500 hover:bg-red-100' : dish.type === DishType.VEGETARIAN ? 'bg-amber-50 text-amber-500 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100'}`}>
+                     <Icon className="w-5 h-5" />
+                     {/* Hidden select to change type */}
+                     <select
+                      value={dish.type}
+                      onChange={(e) => onUpdateDishType(dish.id, e.target.value as DishType)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      title="Change dish type"
+                    >
+                      <option value={DishType.MEAT}>Meat (Everything)</option>
+                      <option value={DishType.VEGETARIAN}>Vegetarian</option>
+                      <option value={DishType.VEGAN}>Vegan</option>
+                    </select>
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800">{dish.name}</h3>
-                    <p className="text-xs text-gray-500 capitalize">{DISH_LABELS[dish.type]}</p>
+                    <div className="relative group/text inline-block">
+                        <p className="text-xs text-gray-500 capitalize flex items-center gap-1 cursor-pointer hover:text-indigo-600 transition-colors">
+                           {DISH_LABELS[dish.type]}
+                           <ChevronDown className="w-3 h-3 opacity-0 group-hover/text:opacity-100 transition-opacity" />
+                        </p>
+                        <select
+                          value={dish.type}
+                          onChange={(e) => onUpdateDishType(dish.id, e.target.value as DishType)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        >
+                          <option value={DishType.MEAT}>Meat (Everything)</option>
+                          <option value={DishType.VEGETARIAN}>Vegetarian</option>
+                          <option value={DishType.VEGAN}>Vegan</option>
+                        </select>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">

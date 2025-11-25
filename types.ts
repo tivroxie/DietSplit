@@ -36,6 +36,9 @@ export interface SavedSplit {
   id: string;
   date: string;
   total: number;
+  subtotal?: number;
+  tax?: number;
+  tip?: number;
   friendCount: number;
   dishCount: number;
   friends: Friend[];
